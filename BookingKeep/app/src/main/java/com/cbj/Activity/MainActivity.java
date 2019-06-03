@@ -12,14 +12,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.cbj.Adapter.MyLvAdapter;
+import com.cbj.Adapter.MainLvAdapter;
 import com.cbj.DataBase.DAOData;
+import com.cbj.DataStruct.Data;
 import com.cbj.DataStruct.ListViewItems;
 import com.cbj.MyView.CircleChart.CCConfig;
 import com.cbj.MyView.CircleChart.CCInfo;
 import com.cbj.MyView.CircleChart.MyCircleChart;
 import com.cbj.MyView.ListView.MyListView;
 import com.cbj.Utils.ColorUtils;
+import com.cbj.Utils.JumpActivityUtils;
 import com.cbj.Utils.ValuesTransform;
 import com.cbj.bookingkeep.R;
 
@@ -27,25 +29,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- *
- */
 public class MainActivity extends AppCompatActivity {
 
     Context mContext;
     private List<ListViewItems> mList = new ArrayList<>();
-    private MyLvAdapter mMyLvAdapter;
+    private MainLvAdapter mMainLvAdapter;
 
     // value
     private int curMonth = 0;
     private int curYear = 0;
     private int curSelectMonth = 0;
 
-    private enum CurChartView {
-        incomeChart, expenseChart
+    // 当前状态（收入、支出）
+    private enum CurIncExpMode {
+        incomeMode, expenseMode
     }
 
-    CurChartView curChartView;
+    CurIncExpMode curIncExpMode;
 
     // top-bar
     private TextView t_curMonthTotalIncome;
@@ -68,25 +68,27 @@ public class MainActivity extends AppCompatActivity {
     // bottom-bar
     private Button btn_book;
     private Button btn_chart;
+    private Button btn_addBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        curChartView = CurChartView.incomeChart;
-        initView();
-        loadData();
+        curIncExpMode = CurIncExpMode.incomeMode;
+        InitView();
+        LoadData();
     }
-
-    private void initView() {
+    // todo 图表显示说明。
+    // 初始化ui
+    private void InitView() {
         // 初始化UI控件
         t_curMonth = findViewById(R.id.t_curMonth);
         btn_last = findViewById(R.id.btn_last);
         btn_next = findViewById(R.id.btn_next);
         btn_book = findViewById(R.id.btn_book);
         btn_chart = findViewById(R.id.btn_chart);
-        Button btn_addBook = findViewById(R.id.btn_addBook);
+        btn_addBook = findViewById(R.id.btn_addBook);
         view_noData = findViewById(R.id.noData);
         t_curMonthTotalExpense = findViewById(R.id.t_expense);
         t_curMonthTotalIncome = findViewById(R.id.t_income);
@@ -99,51 +101,40 @@ public class MainActivity extends AppCompatActivity {
         btn_cc_income = findViewById(R.id.btn_cc_income);
         // 初始化 list view 相关
         mMyListView = findViewById(R.id.lv);
-        mMyLvAdapter = new MyLvAdapter(mList, this);
-        mMyListView.setAdapter(mMyLvAdapter);
+        mMainLvAdapter = new MainLvAdapter(mList, this);
+        mMyListView.setAdapter(mMainLvAdapter);
         mMyListView.setOnLoadMoreListener(new MyListView.OnLoadMoreListener() {
             @Override
             public void loadMore() {
-                loadData();
+                LoadData();
             }
         });
         // 初始化 月份 控件
         Calendar calendar = Calendar.getInstance();
         curMonth = calendar.get(Calendar.MONTH) + 1;
         curYear = calendar.get(Calendar.YEAR);
-        setCurSelectMonth(curMonth);
+        SetCurSelectMonth(curMonth);
         // 初始化 获取当月 数据
         GetCurMonthData();
-        //  无数据的提示
-        setNoDataSign();
-        //  绑定按钮事件
+        // 无数据的提示
+        SetNoDataSign();
+        // 按钮绑定事件
         btn_addBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 获取当前时间
-//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// HH:mm:ss
-//                Date date = new Date(System.currentTimeMillis());
-//                String[] date_time = simpleDateFormat.format(date).split(" ");
-//                Data data = new Data();
-//                data.setDate(date_time[0]);
-//                data.setTime(date_time[1]);
-//                data.setEvent("聚餐");
-//                data.setType("支出");
-//                data.setMoney(-30);
-//                DAOData daoData = new DAOData(mContext);
-//                daoData.insert(data);
+                JumpActivityUtils.Instance().MainToBookAdd(MainActivity.this);
             }
         });
         btn_last.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bindLastBtn();
+                BindLastBtn();
             }
         });
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bindNextBtn();
+                BindNextBtn();
             }
         });
         btn_book.setOnClickListener(new View.OnClickListener() {
@@ -172,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         btn_cc_income.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                curChartView = CurChartView.incomeChart;
+                curIncExpMode = CurIncExpMode.incomeMode;
                 InitCircleChart();
 
                 btn_cc_income.setTextColor(Color.rgb(103, 58, 183));
@@ -185,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         btn_cc_expense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                curChartView = CurChartView.expenseChart;
+                curIncExpMode = CurIncExpMode.expenseMode;
                 InitCircleChart();
 
                 btn_cc_expense.setTextColor(Color.rgb(103, 58, 183));
@@ -202,13 +193,13 @@ public class MainActivity extends AppCompatActivity {
         CCConfig config = new CCConfig();
         if (mList != null) {
             ListViewItems temp;
-            if (curChartView == CurChartView.incomeChart)
+            if (curIncExpMode == CurIncExpMode.incomeMode)
                 for (int i = 0; i < mList.size(); ++i) {
                     temp = mList.get(i);
                     if (temp.getTotal() > 0)
                         config.addData(new CCInfo(temp.getTotal(), ColorUtils.Instance().GetColorR(), temp.getDate()));
                 }
-            else if (curChartView == CurChartView.expenseChart) {
+            else if (curIncExpMode == CurIncExpMode.expenseMode) {
                 for (int i = 0; i < mList.size(); ++i) {
                     temp = mList.get(i);
                     if (temp.getTotal() < 0)
@@ -221,13 +212,14 @@ public class MainActivity extends AppCompatActivity {
         My_cc.postInvalidate();
     }
 
-    private void loadData() {
+    // 加载数据
+    private void LoadData() {
         int size = 0;
         for (int i = 0; i < mList.size(); i++) {
             size += mList.get(0).items.size();
         }
         mMyListView.setLoadCompleted(5 <= size);
-        mMyLvAdapter.notifyDataSetChanged();
+        mMainLvAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -246,16 +238,18 @@ public class MainActivity extends AppCompatActivity {
         int curMonthTotalExpense = 0;
         for (int i = 0; i < mList.size(); i++) {
             ListViewItems temp_lv = mList.get(i);
-            int temp_total = temp_lv.getTotal();
-            if (temp_total > 0)
-                curMonthTotalIncome += temp_total;
-            else
-                curMonthTotalExpense += temp_total;
+            for (int j = 0; j < temp_lv.items.size(); j++) {
+                Data temp_item = temp_lv.items.get(j);
+                if (temp_item.getMoney() > 0) {
+                    curMonthTotalIncome += temp_item.getMoney();
+                } else
+                    curMonthTotalExpense += temp_item.getMoney();
+            }
         }
         t_curMonthTotalIncome.setText(String.format("￥ +%d", curMonthTotalIncome));
         t_curMonthTotalExpense.setText(String.format("￥ %d", curMonthTotalExpense));
-        setNoDataSign();
-        mMyLvAdapter.notifyDataSetChanged();
+        SetNoDataSign();
+        mMainLvAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -271,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
      * @param month
      */
     @SuppressLint("StringFormatMatches")
-    private void setCurSelectMonth(int month) {
+    private void SetCurSelectMonth(int month) {
         if (t_curMonth == null)
             return;
         if (month > 1 && month < curMonth) {
@@ -295,19 +289,18 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 设置“无数据提示控件”的状态
      */
-    private void setNoDataSign() {
+    private void SetNoDataSign() {
         if (mList.size() > 0)
             view_noData.setVisibility(View.GONE);
         else
             view_noData.setVisibility(View.VISIBLE);
     }
 
-
     /**
      * 上个月按钮的点击事件
      */
-    private void bindLastBtn() {
-        setCurSelectMonth(curSelectMonth - 1);
+    private void BindLastBtn() {
+        SetCurSelectMonth(curSelectMonth - 1);
         GetMonthData(curYear, curSelectMonth);
         InitCircleChart();
     }
@@ -315,9 +308,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 下个月按钮的点击事件
      */
-    private void bindNextBtn() {
-        setCurSelectMonth(curSelectMonth + 1);
+    private void BindNextBtn() {
+        SetCurSelectMonth(curSelectMonth + 1);
         GetMonthData(curYear, curSelectMonth);
         InitCircleChart();
     }
+
 }

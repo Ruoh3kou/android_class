@@ -12,4 +12,11 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+       
+
+    <style name="popWindowAnimation">
+        <item name="android:windowEnterAnimation">@anim/popwindow_pop_anim</item>
+        <item name="android:windowExitAnimation">@anim/popwindow_fade_anim</item>
+    </style>
+
 </resources>

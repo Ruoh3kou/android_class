@@ -8,20 +8,20 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.cbj.DataStruct.ListViewItems;
-import com.cbj.bookingkeep.R;
-import com.cbj.MyView.ListView.MyListSubView;
 import com.cbj.DataStruct.Data;
+import com.cbj.DataStruct.ListViewItems;
+import com.cbj.MyView.ListView.MyListSubView;
+import com.cbj.bookingkeep.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyLvAdapter extends BaseAdapter {
+public class MainLvAdapter extends BaseAdapter {
     private List<ListViewItems> mDataList;
     private LayoutInflater mInflater;
     private Context mContext;
 
-    public MyLvAdapter(List<ListViewItems> mList, Context context) {
+    public MainLvAdapter(List<ListViewItems> mList, Context context) {
         super();
         this.mDataList = mList;
         this.mInflater = LayoutInflater.from(context);
@@ -45,7 +45,7 @@ public class MyLvAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.list_item, null);
@@ -71,8 +71,8 @@ public class MyLvAdapter extends BaseAdapter {
             holder.tv_total.setText("+" + total);
         }
 
-        List<Data> mSubList = new ArrayList<>();
-        MySubLvAdapter subAdapter = new MySubLvAdapter(mSubList, mContext);
+        final List<Data> mSubList = new ArrayList<>();
+        MainSubLvAdapter subAdapter = new MainSubLvAdapter(mSubList, mContext);
         holder.lv_sub.setAdapter(subAdapter);
         ArrayList<Data> tempItems = mDataList.get(position).items;
         for (int i = 0; i < tempItems.size(); i++) {

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DataHelper extends SQLiteOpenHelper {
-    DataHelper(Context context) {
+public class HelperData extends SQLiteOpenHelper {
+    HelperData(Context context) {
         super(context, "BookingKeep.db", null, 3);
     }
 

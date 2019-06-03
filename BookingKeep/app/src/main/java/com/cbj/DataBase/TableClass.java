@@ -2,7 +2,7 @@ package com.cbj.DataBase;
 
 import android.provider.BaseColumns;
 
-public class TableClassification implements BaseColumns {
+public class TableClass implements BaseColumns {
     /**
      * 数据库信息
      */
@@ -11,7 +11,7 @@ public class TableClassification implements BaseColumns {
     /**
      * 表名、字段
      */
-    public static final String Table_Name = "classification";
+    public static final String Table_Name = "Class";
     public static final String Column_Event = "event";
     public static final String Column_Type = "type";
 

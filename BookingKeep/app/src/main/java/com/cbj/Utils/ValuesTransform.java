@@ -2,8 +2,11 @@ package com.cbj.Utils;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.widget.ListView;
 
+import com.cbj.DataBase.TableClass;
 import com.cbj.DataBase.TableData;
+import com.cbj.DataStruct.Classification;
 import com.cbj.DataStruct.Data;
 import com.cbj.DataStruct.ListViewItems;
 
@@ -30,6 +33,20 @@ public class ValuesTransform {
     }
 
     /**
+     * 从Cursor生成classification对象
+     *
+     * @param cursor
+     * @return
+     */
+    public static Classification transformCursorToCF(Cursor cursor) {
+        Classification data = new Classification();
+        data.setId(cursor.getInt(cursor.getColumnIndex(TableClass._ID)));
+        data.setEvent(cursor.getString(cursor.getColumnIndex(TableClass.Column_Event)));
+        data.setType(cursor.getString(cursor.getColumnIndex(TableClass.Column_Type)));
+        return data;
+    }
+
+    /**
      * Data结构转换到ContentValues
      *
      * @param data
@@ -46,7 +63,18 @@ public class ValuesTransform {
         return contentValues;
     }
 
-
+    /**
+     * classification结构转换到ContentValues
+     *
+     * @param data
+     * @return
+     */
+    public static ContentValues transformCFToContent(Classification data) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TableClass.Column_Event, data.getEvent());
+        contentValues.put(TableClass.Column_Type, data.getType());
+        return contentValues;
+    }
     /**
      * List<Data> 转到 List<ListViewItems>
      */

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.cbj.Utils.ValuesTransform;
 import com.cbj.DataStruct.Data;
+import com.cbj.Utils.ValuesTransform;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,19 +13,13 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-/**
- * Created by ${新根} on 2017/5/7 0007.
- * blog: http://blog.csdn.net/hexingen
- * <p>
- * Dao的实现类，对Message表进行增删查改操作。
- */
 public class DAOData implements DAO<Data> {
     private Context context;
-    private DataHelper dataHelper;
+    private HelperData helperData;
 
     public DAOData(Context context) {
         this.context = context;
-        this.dataHelper = new DataHelper(this.context);
+        this.helperData = new HelperData(this.context);
     }
 
     @Override
@@ -40,7 +34,7 @@ public class DAOData implements DAO<Data> {
         Cursor cursor = null;
         List<Data> list = null;
         try {
-            sqLiteDatabase = this.dataHelper.getReadableDatabase();
+            sqLiteDatabase = this.helperData.getReadableDatabase();
             cursor = sqLiteDatabase.query(TableData.Table_Name, null, selection, selectionArgs, null, null, TableData.Order_By);
             list = new ArrayList<>();
             if (cursor != null && cursor.moveToFirst()) {
@@ -77,7 +71,7 @@ public class DAOData implements DAO<Data> {
     public void insert(Data data) {
         SQLiteDatabase sqLiteDatabase = null;
         try {
-            sqLiteDatabase = this.dataHelper.getWritableDatabase();
+            sqLiteDatabase = this.helperData.getWritableDatabase();
             sqLiteDatabase.insert(TableData.Table_Name, null, ValuesTransform.transformDataToContent(data));
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,6 +84,16 @@ public class DAOData implements DAO<Data> {
 
     @Override
     public void update(Data data) {
-
+        SQLiteDatabase sqLiteDatabase = null;
+        try {
+            sqLiteDatabase = this.helperData.getWritableDatabase();
+            sqLiteDatabase.update(TableData.Table_Name, ValuesTransform.transformDataToContent(data), "_id=?", new String[]{data.getId() + ""});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
+        }
     }
 }

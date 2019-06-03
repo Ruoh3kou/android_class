@@ -27,7 +27,7 @@ public class MyListView extends ListView implements AbsListView.OnScrollListener
     public MyListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
-}
+    }
 
     public MyListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -40,7 +40,7 @@ public class MyListView extends ListView implements AbsListView.OnScrollListener
     }
 
     //初始化
-    private void init(Context context) {
+    private void init(final Context context) {
         mLoadMoreView = LayoutInflater.from(context).inflate(R.layout.list_load_more, null);
         mLoadCompleteView = LayoutInflater.from(context).inflate(R.layout.list_load_complete, null);
         setOnScrollListener(this);
@@ -65,7 +65,8 @@ public class MyListView extends ListView implements AbsListView.OnScrollListener
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                         int totalItemCount) {
         mIsAllVisible = totalItemCount == visibleItemCount;
     }
 

@@ -39,7 +39,7 @@
         android:gravity="center">
 
         <Button
-            android:id="@+id/book_btn_income"
+            android:id="@+id/book_btn_expense"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_underline_blue"
@@ -48,7 +48,7 @@
             android:textSize="20dp" />
 
         <Button
-            android:id="@+id/book_btn_expense"
+            android:id="@+id/book_btn_income"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -69,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
             android:layout_margin="20dp"
             android:text="金额"
             android:textColor="#000000"
@@ -76,11 +77,25 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/book_text_icon_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toLeftOf="@+id/book_edit_money"
+            android:text="￥"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/book_edit_money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_margin="20dp"
-            android:text="￥0.00"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="20dp"
+            android:background="@null"
+            android:hint="0.00"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -92,6 +107,7 @@
         android:background="#646161" />
     <!-- 分类 -->
     <RelativeLayout
+        android:id="@+id/book_rl_sort"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -106,18 +122,18 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/book_text_event"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/book_btn_sort"
-            android:layout_marginVertical="20dp"
-            android:layout_marginRight="40dp"
-            android:text="分类信息"
+            android:layout_centerInParent="true"
+            android:layout_toLeftOf="@+id/book_img_sort"
+            android:hint="分类信息"
             android:textColor="#888888"
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/book_btn_sort"
+        <ImageView
+            android:id="@+id/book_img_sort"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
@@ -152,10 +168,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_margin="20dp"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="20dp"
             android:background="@null"
-            android:text="添加备注"
-            android:textColor="#888888"
+            android:hint="添加备注"
+            android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -165,6 +182,7 @@
         android:layout_height="1dp"
         android:background="#646161" />
 
+    <!-- 保存按钮 -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
