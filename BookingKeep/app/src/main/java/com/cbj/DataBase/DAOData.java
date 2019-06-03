@@ -63,7 +63,7 @@ public class DAOData implements DAO<Data> {
     }
 
     @Override
-    public void delete() {
+    public void delete(Data data) {
 
     }
 

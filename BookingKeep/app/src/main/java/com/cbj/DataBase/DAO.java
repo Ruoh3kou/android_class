@@ -8,7 +8,7 @@ public interface DAO<T> {
     List<T> queryAction(String selection,
                         String[] selectionArgs);
 
-    void delete();
+    void delete(T t);
 
     void insert(T t);
 

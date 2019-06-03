@@ -28,18 +28,25 @@ public class OptionActivity extends AppCompatActivity {
     private Context mContext;
     private ListView listView;
     private Button btn_back;
-    private Button btn_option;
+    public Button btn_addNew;
     private Button btn_income;
     private Button btn_expense;
     private OptionLvAdapter adapter;
-    private List<String> mList = new ArrayList<>();
+    private List<Classification> mList = new ArrayList<>();
     public int curState = 1;// 1支出2收入
-//todo 长按多选删除
+    public boolean isMultiple;
+    public List<Boolean> selectList;
+    public Button btn_del;
+    public Button btn_edit;
+    public Button btn_undo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_option);
         mContext = this;
+        isMultiple = false;
+        selectList = new ArrayList<>();
         listView = findViewById(R.id.option_listView);
         adapter = new OptionLvAdapter(mList, this);
         listView.setAdapter(adapter);
@@ -54,8 +61,8 @@ public class OptionActivity extends AppCompatActivity {
             }
         });
         // 新添加按钮
-        btn_option = findViewById(R.id.option_btn_add);
-        btn_option.setOnClickListener(new View.OnClickListener() {
+        btn_addNew = findViewById(R.id.option_btn_add);
+        btn_addNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopupWindow(v);
@@ -86,25 +93,69 @@ public class OptionActivity extends AppCompatActivity {
                 GetClassData();
             }
         });
+
+        btn_del = findViewById(R.id.option_btn_del);
+        btn_edit = findViewById(R.id.option_btn_edit);
+        btn_undo = findViewById(R.id.option_btn_undo);
+        btn_del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isMultiple) {
+                    DAOClass daoClass = new DAOClass(mContext);
+                    for (int i = 0; i < selectList.size(); i++) {
+                        if (selectList.get(i)) {
+                            daoClass.delete(mList.get(i));
+                        }
+                    }
+                    GetClassData();
+                    isMultiple = false;
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+        btn_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isMultiple) {
+                    showPopupWindow(v);
+                }
+            }
+        });
+        btn_undo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isMultiple) {
+                    selectList.clear();
+                    isMultiple = false;
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+    }
+
+    public void SetSelectList() {
+        selectList.clear();
+        for (int i = 0; i < mList.size(); i++) {
+            selectList.add(false);
+        }
     }
 
     private void GetClassData() {
         DAOClass daoClass = new DAOClass(mContext);
         mList.clear();
-        List<Classification> tempList = new ArrayList<>(daoClass.queryAll());
-        if (curState == 1)//支出
-        {
-            for (int i = 0; i < tempList.size(); i++) {
-                if (tempList.get(i).getType().equals("支出") && !mList.contains(tempList.get(i).getEvent()))
-                    mList.add(tempList.get(i).getEvent());
-            }
-        } else if (curState == 2)//收入
-        {
-            for (int i = 0; i < tempList.size(); i++) {
-                if (tempList.get(i).getType().equals("收入") && !mList.contains(tempList.get(i).getEvent()))
-                    mList.add(tempList.get(i).getEvent());
+        List<Classification> tempList = new ArrayList<>();
+        if (curState == 1) {
+            tempList = new ArrayList<>(daoClass.queryAction("type=?", new String[]{"支出"}));
+        } else if (curState == 2) {
+            tempList = new ArrayList<>(daoClass.queryAction("type=?", new String[]{"收入"}));
+        }
+        for (int i = 0; i < tempList.size(); i++) {
+            if (!mList.contains(tempList.get(i))) {
+                mList.add(tempList.get(i));
             }
         }
+        SetSelectList();
         adapter.notifyDataSetChanged();
     }
 
@@ -115,6 +166,15 @@ public class OptionActivity extends AppCompatActivity {
         Button btn_cancel = popupWindow_view.findViewById(R.id.pop_btn_cancel);
         Button btn_confirm = popupWindow_view.findViewById(R.id.pop_btn_confirm);
         final EditText edit_event = popupWindow_view.findViewById(R.id.pop_edit_text);
+        Classification isMultiTemp = new Classification();
+        if (isMultiple) {
+            for (int i = 0; i < selectList.size(); i++)
+                if (selectList.get(i)) {
+                    isMultiTemp = mList.get(i);
+                    break;
+                }
+        }
+        edit_event.setText(isMultiTemp.getEvent());
         final PopupWindow popupWindow = new PopupWindow(popupWindow_view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setAnimationStyle(R.style.popWindowAnimation);//设置弹出和消失的动画
         popupWindow.setFocusable(true);// 取得焦点
@@ -151,6 +211,7 @@ public class OptionActivity extends AppCompatActivity {
             }
         });
         // 确认
+        final Classification finalIsMultiTemp = isMultiTemp;
         btn_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,8 +225,14 @@ public class OptionActivity extends AppCompatActivity {
                     else
                         temp.setType("收入");
                     DAOClass daoClass = new DAOClass(mContext);
-                    daoClass.insert(temp);
-                    GetClassData();
+                    if (isMultiple) {
+                        temp.setId(finalIsMultiTemp.getId());
+                        daoClass.update(temp);
+                        GetClassData();
+                    } else {
+                        daoClass.insert(temp);
+                        GetClassData();
+                    }
                     backgroundAlpha(1);
                     popupWindow.dismiss();
                 }
@@ -179,4 +246,5 @@ public class OptionActivity extends AppCompatActivity {
         lp.alpha = bgAlpha; //0.0-1.0
         getWindow().setAttributes(lp);
     }
+
 }

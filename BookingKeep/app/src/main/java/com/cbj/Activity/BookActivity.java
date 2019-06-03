@@ -92,8 +92,6 @@ public class BookActivity extends AppCompatActivity {
                     Toast.makeText(mContext, "信息填写不完整", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                curData.setDate(TimeUtils.Instance().getCurDate());
-                curData.setTime(TimeUtils.Instance().getCurTime());
                 curData.setDec(edit_dec.getText().toString());
                 curData.setEvent(text_event.getText().toString());
                 if (curIncExpMode.equals(CurIncExpMode.incomeMode)) {
@@ -103,6 +101,8 @@ public class BookActivity extends AppCompatActivity {
                 }
                 curData.setType(getCurState());
                 if (isNew) {
+                    curData.setDate(TimeUtils.Instance().getCurDate());
+                    curData.setTime(TimeUtils.Instance().getCurTime());
                     daoData.insert(curData);
                     Toast.makeText(mContext, "添加成功", Toast.LENGTH_SHORT).show();
                 } else {

@@ -50,7 +50,7 @@ public class ClassLvAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.list_class_item, null);
             holder = new ViewHolder();
             holder.tv_name = convertView.findViewById(R.id.list_class_item_text);
-            holder.rl_item = convertView.findViewById(R.id.list_class_item_rl);
+            holder.rl_item = convertView.findViewById(R.id.list_option_item_rl);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

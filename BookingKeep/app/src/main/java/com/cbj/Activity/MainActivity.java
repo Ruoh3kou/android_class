@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         InitView();
         LoadData();
     }
+
     // todo 图表显示说明。
     // 初始化ui
     private void InitView() {
@@ -188,24 +189,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 设置图表信息
+    // todo 显示条目
     private void InitCircleChart() {
         ColorUtils.Instance().ResetIndex();
         CCConfig config = new CCConfig();
-        if (mList != null) {
-            ListViewItems temp;
-            if (curIncExpMode == CurIncExpMode.incomeMode)
-                for (int i = 0; i < mList.size(); ++i) {
-                    temp = mList.get(i);
-                    if (temp.getTotal() > 0)
-                        config.addData(new CCInfo(temp.getTotal(), ColorUtils.Instance().GetColorR(), temp.getDate()));
-                }
-            else if (curIncExpMode == CurIncExpMode.expenseMode) {
-                for (int i = 0; i < mList.size(); ++i) {
-                    temp = mList.get(i);
-                    if (temp.getTotal() < 0)
-                        config.addData(new CCInfo(Math.abs(temp.getTotal()), ColorUtils.Instance().GetColorB(), temp.getDate()));
-                }
-
+        ListViewItems temp;
+        if (curIncExpMode == CurIncExpMode.incomeMode)
+            for (int i = 0; i < mList.size(); ++i) {
+                temp = mList.get(i);
+                if (temp.getTotal() > 0)
+                    config.addData(new CCInfo(temp.getTotal(), ColorUtils.Instance().GetColorR(), temp.getDate()));
+            }
+        else if (curIncExpMode == CurIncExpMode.expenseMode) {
+            for (int i = 0; i < mList.size(); ++i) {
+                temp = mList.get(i);
+                if (temp.getTotal() < 0)
+                    config.addData(new CCInfo(Math.abs(temp.getTotal()), ColorUtils.Instance().GetColorB(), temp.getDate()));
             }
         }
         My_cc.applyConfig(config);

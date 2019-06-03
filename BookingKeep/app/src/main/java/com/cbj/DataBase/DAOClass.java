@@ -54,8 +54,18 @@ public class DAOClass implements DAO<Classification> {
 
 
     @Override
-    public void delete() {
-
+    public void delete(Classification data) {
+        SQLiteDatabase sqLiteDatabase = null;
+        try {
+            sqLiteDatabase = this.helperCF.getWritableDatabase();
+            sqLiteDatabase.delete(TableClass.Table_Name, "_id=?", new String[]{data.getId() + ""});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
+        }
     }
 
     @Override
@@ -75,6 +85,16 @@ public class DAOClass implements DAO<Classification> {
 
     @Override
     public void update(Classification data) {
-
+        SQLiteDatabase sqLiteDatabase = null;
+        try {
+            sqLiteDatabase = this.helperCF.getWritableDatabase();
+            sqLiteDatabase.update(TableClass.Table_Name, ValuesTransform.transformCFToContent(data), "_id=?", new String[]{data.getId() + ""});
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (sqLiteDatabase != null) {
+                sqLiteDatabase.close();
+            }
+        }
     }
 }
