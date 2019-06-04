@@ -1,7 +1,6 @@
 package com.cbj.MyView.CircleChart;
 
 import android.graphics.Paint;
-import android.graphics.Path;
 
 import java.util.UUID;
 
@@ -10,10 +9,7 @@ final class CCInfoImpl {
     private final ICCInfo mICCInfo;
     private float startAngle;
     private float endAngle;
-
-    //调味料
     private Paint mPaint;
-    private Path mLinePath;
 
     public static CCInfoImpl create(ICCInfo info) {
         return new CCInfoImpl(info);
@@ -27,7 +23,6 @@ final class CCInfoImpl {
 
     private void initPaint(ICCInfo info) {
         if (mPaint == null) mPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        if (mLinePath == null) mLinePath = new Path();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(60);
         mPaint.setColor(info.getColor());
@@ -51,5 +46,9 @@ final class CCInfoImpl {
 
     public Paint getPaint() {
         return mPaint;
+    }
+
+    public float getEndAngle() {
+        return endAngle;
     }
 }

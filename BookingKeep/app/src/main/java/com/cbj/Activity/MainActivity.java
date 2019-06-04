@@ -27,12 +27,14 @@ import com.cbj.bookingkeep.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     Context mContext;
     private List<ListViewItems> mList = new ArrayList<>();
+    private HashMap<String, Integer> hashEventMoney = new HashMap<>();
     private MainLvAdapter mMainLvAdapter;
 
     // value
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        curIncExpMode = CurIncExpMode.incomeMode;
+        curIncExpMode = CurIncExpMode.expenseMode;
         InitView();
         LoadData();
     }
@@ -166,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 curIncExpMode = CurIncExpMode.incomeMode;
                 InitCircleChart();
-
                 btn_cc_income.setTextColor(Color.rgb(103, 58, 183));
                 btn_cc_expense.setTextColor(Color.rgb(0, 0, 0));
                 btn_cc_income.setBackgroundResource(R.drawable.btn_underline_blue);
@@ -179,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 curIncExpMode = CurIncExpMode.expenseMode;
                 InitCircleChart();
-
                 btn_cc_expense.setTextColor(Color.rgb(103, 58, 183));
                 btn_cc_income.setTextColor(Color.rgb(0, 0, 0));
                 btn_cc_expense.setBackgroundResource(R.drawable.btn_underline_blue);
@@ -193,19 +193,42 @@ public class MainActivity extends AppCompatActivity {
     private void InitCircleChart() {
         ColorUtils.Instance().ResetIndex();
         CCConfig config = new CCConfig();
-        ListViewItems temp;
+        List<Data> tempDataList;
+        hashEventMoney.clear();
+        if (curIncExpMode == CurIncExpMode.incomeMode) {
+            for (int i = 0; i < mList.size(); ++i) {
+                tempDataList = mList.get(i).items;
+                for (int j = 0; j < tempDataList.size(); j++) {
+                    Data temp = tempDataList.get(j);
+                    if (temp.getMoney() > 0) {
+                        if (hashEventMoney.containsKey(temp.getEvent()))
+                            hashEventMoney.put(temp.getEvent(), hashEventMoney.get(temp.getEvent()) + temp.getMoney());
+                        else
+                            hashEventMoney.put(temp.getEvent(), temp.getMoney());
+                    }
+                }
+            }
+        } else if (curIncExpMode == CurIncExpMode.expenseMode) {
+            for (int i = 0; i < mList.size(); ++i) {
+                tempDataList = mList.get(i).items;
+                for (int j = 0; j < tempDataList.size(); j++) {
+                    Data temp = tempDataList.get(j);
+                    if (temp.getMoney() < 0) {
+                        if (hashEventMoney.containsKey(temp.getEvent()))
+                            hashEventMoney.put(temp.getEvent(), hashEventMoney.get(temp.getEvent()) + temp.getMoney());
+                        else
+                            hashEventMoney.put(temp.getEvent(), temp.getMoney());
+                    }
+                }
+            }
+        }
+
         if (curIncExpMode == CurIncExpMode.incomeMode)
-            for (int i = 0; i < mList.size(); ++i) {
-                temp = mList.get(i);
-                if (temp.getTotal() > 0)
-                    config.addData(new CCInfo(temp.getTotal(), ColorUtils.Instance().GetColorR(), temp.getDate()));
+            for (HashMap.Entry<String, Integer> entry : hashEventMoney.entrySet()) {
+                config.addData(new CCInfo(entry.getValue(), ColorUtils.Instance().GetColorR(), entry.getKey()));
             }
-        else if (curIncExpMode == CurIncExpMode.expenseMode) {
-            for (int i = 0; i < mList.size(); ++i) {
-                temp = mList.get(i);
-                if (temp.getTotal() < 0)
-                    config.addData(new CCInfo(Math.abs(temp.getTotal()), ColorUtils.Instance().GetColorB(), temp.getDate()));
-            }
+        else for (HashMap.Entry<String, Integer> entry : hashEventMoney.entrySet()) {
+            config.addData(new CCInfo(Math.abs(entry.getValue()), ColorUtils.Instance().GetColorB(), entry.getKey()));
         }
         My_cc.applyConfig(config);
         My_cc.postInvalidate();

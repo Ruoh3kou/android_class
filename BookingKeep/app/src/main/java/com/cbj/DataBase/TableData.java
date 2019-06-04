@@ -18,7 +18,6 @@ public class TableData implements BaseColumns {
     public static final String Column_Money = "money";
     public static final String Column_Time = "time";
     public static final String Column_Dec = "dec";
-
     /**
      * 时间字段的格式
      */

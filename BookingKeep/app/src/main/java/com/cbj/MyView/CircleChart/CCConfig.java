@@ -27,9 +27,6 @@ public class CCConfig implements Serializable {
         return mCCInfos;
     }
 
-    /**
-     * 为了区分参数配置和参数计算，这里用一个内部类来管理
-     */
     protected final class AnimatedCCViewHelper {
         private double sumValue;
 

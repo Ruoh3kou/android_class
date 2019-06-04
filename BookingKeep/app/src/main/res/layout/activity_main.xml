@@ -167,7 +167,7 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/btn_cc_income"
+                android:id="@+id/btn_cc_expense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_underline_blue"
@@ -176,7 +176,7 @@
                 android:textSize="20dp" />
 
             <Button
-                android:id="@+id/btn_cc_expense"
+                android:id="@+id/btn_cc_income"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@null"

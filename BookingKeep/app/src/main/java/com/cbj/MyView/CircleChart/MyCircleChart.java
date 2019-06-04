@@ -32,10 +32,8 @@ public class MyCircleChart extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         final float width = getWidth() - getPaddingLeft() - getPaddingRight();
         final float height = getHeight() - getPaddingTop() - getPaddingBottom();
-
         canvas.translate(width / 2, height / 3);
         // 半径
         final float radius = (float) (Math.min(width, height) / 4);
@@ -44,7 +42,8 @@ public class MyCircleChart extends View {
         if (mCurrentInfos != null) {
             for (int i = 0; i < mCurrentInfos.size(); i++) {
                 CCInfoImpl mCurrentInfo = mCurrentInfos.get(i);
-                canvas.drawArc(mDrawRectF, mCurrentInfo.getStartAngle(), 360 - mCurrentInfo.getStartAngle(), false, mCurrentInfo.getPaint());
+                float sweetAngle = 360 - mCurrentInfo.getStartAngle();
+                canvas.drawArc(mDrawRectF, mCurrentInfo.getStartAngle(), sweetAngle, false, mCurrentInfo.getPaint());
             }
         }
     }
